@@ -1,0 +1,3 @@
+environment_name            = "prod"
+leaderboard_window_days       = 7
+postgres_connection_string  = "Host=YOUR_HOST;Port=5432;Database=high_performance_ingest;Username=app;Password=SECRET;SSL Mode=Require"

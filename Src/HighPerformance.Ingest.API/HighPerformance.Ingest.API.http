@@ -1,0 +1,6 @@
+@HighPerformance.Ingest.API_HostAddress = http://localhost:5181
+
+GET {{HighPerformance.Ingest.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,58 @@
+# Local / demo: ASP.NET Core 10 + PostgreSQL 16 + Npgsql/EF Core
+# Usage (from repository root):
+#   docker compose -f deploy/docker-compose.yml up --build
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: high_performance_ingest
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d high_performance_ingest"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres_goskaler:
+    image: postgres:16-alpine
+    profiles: ["goskaler"]
+    environment:
+      POSTGRES_USER: GoSkalerTT
+      # Docker Compose treats '$' as interpolation; '$$$' must be escaped as '$$$$$$'.
+      POSTGRES_PASSWORD: "L4M4sS3gur4$$$$$$"
+      POSTGRES_DB: high_performance_ingest
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_goskaler:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U GoSkalerTT -d high_performance_ingest"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__PostgreSql: "Host=postgres;Port=5432;Database=high_performance_ingest;Username=postgres;Password=postgres"
+      LeaderboardSettings__WindowDays: "7"
+      LeaderboardSettings__MaxScoreBatchSize: "10000"
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+  pgdata_goskaler:

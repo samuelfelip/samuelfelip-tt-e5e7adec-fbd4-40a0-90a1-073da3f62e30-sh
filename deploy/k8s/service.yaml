@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: highperf-ingest-api
+  labels:
+    app: highperf-ingest-api
+spec:
+  type: ClusterIP
+  selector:
+    app: highperf-ingest-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

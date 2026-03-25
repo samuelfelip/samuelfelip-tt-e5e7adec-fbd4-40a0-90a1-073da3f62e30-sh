@@ -1,0 +1,35 @@
+# Visual Studio / Rider
+.vs/
+.idea/
+.vscode/
+*.slnx
+*.user
+*.suo
+*.userosscache
+
+# Build outputs
+**/bin/
+**/obj/
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+coverage/
+
+# NuGet
+packages/
+
+# Logging
+*.log
+
+# Local environment / secrets
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Docker / dotenv
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db

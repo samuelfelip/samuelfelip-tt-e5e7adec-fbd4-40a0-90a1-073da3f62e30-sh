@@ -1,0 +1,58 @@
+# Kubernetes — ASP.NET Core 10 API (MediatR, EF Core, Npgsql, Swagger)
+# Replace YOUR_REGISTRY/highperf-ingest-api:tag and set secrets in k8s/secret.example.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: highperf-ingest-api
+  labels:
+    app: highperf-ingest-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: highperf-ingest-api
+  template:
+    metadata:
+      labels:
+        app: highperf-ingest-api
+    spec:
+      containers:
+        - name: api
+          image: YOUR_REGISTRY/highperf-ingest-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:8080
+            - name: ConnectionStrings__PostgreSql
+              valueFrom:
+                secretKeyRef:
+                  name: highperf-ingest-secrets
+                  key: postgres-connection-string
+            - name: LeaderboardSettings__WindowDays
+              value: "7"
+            - name: LeaderboardSettings__MaxScoreBatchSize
+              value: "10000"
+          # Production: Swagger is disabled; probe hits read-only API + PostgreSQL
+          readinessProbe:
+            httpGet:
+              path: /api/leaderboard?top=1
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"

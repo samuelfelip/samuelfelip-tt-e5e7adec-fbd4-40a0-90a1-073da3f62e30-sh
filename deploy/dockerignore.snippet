@@ -1,0 +1,19 @@
+# Duplicate of repository root `.dockerignore` (kept here for reference).
+# `docker build -f deploy/Dockerfile .` uses the ignore file at the build context root.
+
+.git
+.github
+.vs
+.idea
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
+Tests/
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/*.user
+*.md
+deploy/docker-compose.yml
+.env
+.env.*

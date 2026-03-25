@@ -1,0 +1,34 @@
+# One-off EF Core migrations against PostgreSQL.
+# Option A (recommended): run locally / in CI after image push:
+#   dotnet ef database update --project Src/HighPerformance.Ingest.Infrastructure --startup-project Src/HighPerformance.Ingest.API
+# Option B: use a CI job with the SDK image mounting this repo.
+#
+# This manifest is a placeholder: the runtime API image does not include `dotnet-ef`.
+# For in-cluster migrations, build a small migrate image (sdk + repo) or use an external pipeline.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: highperf-db-migrate-once
+spec:
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: mcr.microsoft.com/dotnet/sdk:10.0
+          workingDir: /src
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              echo "Mount your repo or copy sources here; then run:"
+              echo "dotnet tool install --global dotnet-ef --version 10.0.*"
+              echo "dotnet ef database update --project Src/HighPerformance.Ingest.Infrastructure --startup-project Src/HighPerformance.Ingest.API"
+              exit 1
+          env:
+            - name: ConnectionStrings__PostgreSql
+              valueFrom:
+                secretKeyRef:
+                  name: highperf-ingest-secrets
+                  key: postgres-connection-string

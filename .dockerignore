@@ -1,0 +1,15 @@
+.git
+.github
+.vs
+.idea
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
+Tests/
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/*.user
+deploy/docker-compose.yml
+.env
+.env.*
