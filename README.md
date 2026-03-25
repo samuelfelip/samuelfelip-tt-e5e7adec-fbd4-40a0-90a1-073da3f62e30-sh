@@ -1,6 +1,6 @@
 # HighPerformance.Ingest.API
 
-Boilerplate de .NET 10 Web API con arquitectura limpia, CQRS con MediatR, EF Core + PostgreSQL y leaderboard global: los scores se insertan en forma append-only usando `IScoreBulkIngestService` (binary `COPY` con Npgsql en PostgreSQL; EF en SQLite para tests).
+App de .NET 10 Web API con arquitectura limpia, CQRS con MediatR, EF Core + PostgreSQL y leaderboard global: los scores se insertan en forma append-only usando `IScoreBulkIngestService` (binary `COPY` con Npgsql en PostgreSQL; EF en SQLite para tests).
 
 **Endpoints de escritura:**
 
