@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace HighPerformance.Ingest.Infrastructure.Persistence.Migrations;
 
-[Migration("202603260001_RemoveProductos")]
 public partial class RemoveProductos : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
