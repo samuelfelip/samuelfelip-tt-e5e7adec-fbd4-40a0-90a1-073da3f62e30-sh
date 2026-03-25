@@ -2,6 +2,9 @@
 
 Documento técnico de la solución para el servicio de leaderboard global.
 
+utilicé la ia en primer lugar para investigar la mejor forma de realizar el proyecto teniendo en cuenta la carga teniendo en cuenta la DB y el Orm a usar: en este caso fue PostgreSQL y EF, luego generé un Boilerplate usando la arquitectura definida abajo, luego implemente la logica del problema a realizar y luego implementé las pruebas unitarias y al final tuve problema para implementar las migraciones ya que con el boilerplate generé un script sql para generar la DB, luego arreglado eso me ayudé con la ia a hacer los readme's, luego realicé los diagramas en imagenes y luego le pedí a la ia que me ayudara a ponerlos en los readmes con las herramientas del markdown, ahora por ultimo estoy ayudandime a generar la documentacion de la db y enviar el commit final.
+
+
 ## 1) Arquitectura
 
 La solución sigue una estructura de capas tipo Clean Architecture + CQRS/MediatR:
@@ -79,7 +82,41 @@ sequenceDiagram
 
 ## 3) Modelo de datos y reglas de negocio
 
-Tabla principal:
+### Esquema de base de datos
+
+```mermaid
+flowchart TB
+  subgraph PostgreSQL["PostgreSQL – high_performance_ingest"]
+    subgraph ScoreEntries["ScoreEntries"]
+      direction TB
+      col_id["Id : uuid  PK"]
+      col_uid["UserId : varchar(200)  NOT NULL"]
+      col_score["Score : bigint  NOT NULL"]
+      col_ts["Timestamp : timestamptz  NOT NULL"]
+      col_xmin["xmin : xid  (concurrency token)"]
+    end
+    subgraph Indexes["Índices"]
+      pk["PK_ScoreEntries (Id)"]
+      ix["IX_ScoreEntries_UserId_Timestamp (UserId, Timestamp)"]
+    end
+    subgraph EFHistory["__EFMigrationsHistory"]
+      mig_id["MigrationId : varchar(150)  PK"]
+      mig_pv["ProductVersion : varchar(32)  NOT NULL"]
+    end
+  end
+
+  ScoreEntries --> Indexes
+```
+
+### Migraciones aplicadas
+
+| Migración | Acción |
+|---|---|
+| `202603240001_InitialCreate` | Crea tabla `Productos` (legacy, ya eliminada) |
+| `202603250001_AddScoreEntries` | Crea tabla `ScoreEntries` + índice compuesto |
+| `202603260001_RemoveProductos` | Elimina tabla `Productos` |
+
+### Tabla principal
 
 - `ScoreEntries(Id, UserId, Score, Timestamp, xmin)`
 - Índice: `IX_ScoreEntries_UserId_Timestamp`

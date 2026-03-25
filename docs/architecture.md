@@ -104,6 +104,8 @@ sequenceDiagram
 
 EF Core mapea entidades a tablas. En **PostgreSQL**, la propiedad `Version` se enlaza a **`xmin`** como token de concurrencia; en otros proveedores (p. ej. SQLite en tests) se omite.
 
+### Diagrama ER
+
 ```mermaid
 erDiagram
   ScoreEntry {
@@ -114,6 +116,40 @@ erDiagram
     xid xmin "sólo Npgsql"
   }
 ```
+
+### Esquema de la base de datos
+
+```mermaid
+flowchart TB
+  subgraph PostgreSQL["PostgreSQL – high_performance_ingest"]
+    subgraph ScoreEntries["ScoreEntries"]
+      direction TB
+      col_id["Id : uuid  PK"]
+      col_uid["UserId : varchar(200)  NOT NULL"]
+      col_score["Score : bigint  NOT NULL"]
+      col_ts["Timestamp : timestamptz  NOT NULL"]
+      col_xmin["xmin : xid  (concurrency token)"]
+    end
+    subgraph Indexes["Índices"]
+      pk["PK_ScoreEntries (Id)"]
+      ix["IX_ScoreEntries_UserId_Timestamp (UserId, Timestamp)"]
+    end
+    subgraph EFHistory["__EFMigrationsHistory"]
+      mig_id["MigrationId : varchar(150)  PK"]
+      mig_pv["ProductVersion : varchar(32)  NOT NULL"]
+    end
+  end
+
+  ScoreEntries --> Indexes
+```
+
+### Migraciones aplicadas
+
+| Migración | Acción |
+|---|---|
+| `202603240001_InitialCreate` | Crea tabla `Productos` (legacy, ya eliminada) |
+| `202603250001_AddScoreEntries` | Crea tabla `ScoreEntries` + índice compuesto |
+| `202603260001_RemoveProductos` | Elimina tabla `Productos` |
 
 Índice relevante para el leaderboard: **`IX_ScoreEntries_UserId_Timestamp`** para acelerar filtros por usuario y por ventana temporal.
 
